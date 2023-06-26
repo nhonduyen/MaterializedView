@@ -1,8 +1,5 @@
 ﻿using MaterializedViews.API.Models;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Diagnostics.Metrics;
-using System.Reflection.Emit;
 
 namespace MaterializedViews.API.Infrastructrure.Data
 {
@@ -16,6 +13,11 @@ namespace MaterializedViews.API.Infrastructrure.Data
         {
             modelBuilder.HasDefaultSchema("Source");
             modelBuilder.HasDefaultSchema("Dest");
+
+            //modelBuilder.Entity<WidgetLatestState>().ToView("uv_WidgetLatestState");
+
+            modelBuilder.Entity<Event>()
+            .HasKey(p => new { p.TripID, p.WidgetID, p.EventTypeID, p.EventDate });
 
             modelBuilder.Entity<Event>()
             .HasIndex(p => new { p.TripID, p.WidgetID })
@@ -47,6 +49,7 @@ namespace MaterializedViews.API.Infrastructrure.Data
 
             modelBuilder.Entity<WidgetLatestState>()
             .HasIndex(p => p.DepartureDate)
+            .HasFilter("[DepartureDate] IS NOT NULL")
             .HasDatabaseName("IDX_WidgetLatestState_Departure");
 
             modelBuilder.Entity<EventType>().HasData(
@@ -79,5 +82,7 @@ namespace MaterializedViews.API.Infrastructrure.Data
 
         public DbSet<EventType> EventType { get; set; }
         public DbSet<Event> Event { get; set; }
+        public DbSet<WidgetLatestState> WidgetLatestState { get; set; }
+        
     }
 }
